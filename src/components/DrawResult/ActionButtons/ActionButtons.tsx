@@ -4,7 +4,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 
 import styles from './ActionButtons.module.css'
-import { drawValueAndStartAnimation } from '../../../store/features/draw/draw.service'
+import { drawValueAndStartAnimation, reinsertValues } from '../../../store/features/draw/draw.service'
 import { RootState } from '../../../store/store'
 import globalStyles from '../../styles.module.css'
 
@@ -24,7 +24,16 @@ const ActionButtons = ({ slug, hidden }: ActionButtonsProps) => {
     if (draw.draw.drawnIndex === null) {
       return
     }
-    drawValueAndStartAnimation(draw.draw.values.filter((v, i) => i !== draw.draw.drawnIndex))
+    // Save drawn value...
+    const newDrawnValues = [...draw.draw.previousValues, draw.draw.values[draw.draw.drawnIndex]]
+    // ...then remove it from values
+    const newValues = draw.draw.values.filter((v, i) => i !== draw.draw.drawnIndex)
+    drawValueAndStartAnimation(newValues, newDrawnValues)
+  }
+
+  const handleReinsertAndBack = (): void => {
+    reinsertValues(draw.draw)
+    // handleBack()
   }
 
   const value = draw.draw.values[draw.draw.drawnIndex]
@@ -46,16 +55,29 @@ const ActionButtons = ({ slug, hidden }: ActionButtonsProps) => {
           data-cy="ActionButtons_modifyButton"
           className={styles.button}
           type="button"
-          onClick={() => router.push('/')}
+          onClick={() => {
+            router.push('/')
+            handleReinsertAndBack()
+          }}
         >
           <i className={classnames('fa fa-long-arrow-left', styles.icon)} aria-hidden="true"></i>
           Modifier
         </button>
+        {draw.draw.previousValues.length > 0 ? (
+          <button
+            className={styles.button}
+            type="button"
+            onClick={() => reinsertValues(draw.draw) }
+          >
+            <i className={classnames('fa fa-repeat', styles.icon)} aria-hidden="true"></i>
+            Réinsérer toutes
+          </button>
+        ) : null}
         <button
           data-cy="ActionButtons_restartButton"
           className={styles.button}
           type="button"
-          onClick={() => drawValueAndStartAnimation(draw.draw.values)}
+          onClick={() => drawValueAndStartAnimation(draw.draw.values, draw.draw.previousValues)}
         >
           <i className={classnames('fa fa-random', styles.icon)} aria-hidden="true"></i>
           Refaire
