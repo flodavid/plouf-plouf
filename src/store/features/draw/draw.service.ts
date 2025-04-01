@@ -1,19 +1,19 @@
 import Router from 'next/router'
 
-import { drawSlice } from './draw.slice'
-import { drawIndex, drawToSlug } from './helpers'
-import Values from './types/Values.type'
 import { store } from '../../store'
 import { animationSlice } from '../animation/animation.slice'
+import { drawSlice } from './draw.slice'
+import { drawIndex, drawToSlug } from './helpers'
 import Draw from './types/Draw.type'
+import Values from './types/Values.type'
 
 
-export function drawValueAndStartAnimation(values: Values, previousValues: Values) {
+export function drawValueAndStartAnimation(values: Values, previousValues?: Values) {
   const drawnIndex = drawIndex(values)
   store.dispatch(animationSlice.actions.reset())
   const newDraw: Draw = {
     values,
-    previousValues,
+    previousValues: (previousValues ? previousValues : []),
     drawnIndex,
   }
   store.dispatch(drawSlice.actions.setDraw(newDraw))
@@ -27,11 +27,10 @@ export function drawValueAndStartAnimation(values: Values, previousValues: Value
  */
 export function reinsertValues(draw: Draw) {
   const values = draw.values.concat(draw.previousValues)
-  const previousValues: Array<string> = []
   const drawnIndex = draw.drawnIndex
   const newDraw: Draw = {
     values,
-    previousValues,
+    previousValues: [],
     drawnIndex
   }
 

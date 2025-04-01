@@ -3,10 +3,10 @@ import { useRouter } from 'next/router'
 import React from 'react'
 import { useSelector } from 'react-redux'
 
-import styles from './ActionButtons.module.css'
 import { drawValueAndStartAnimation, reinsertValues } from '../../../store/features/draw/draw.service'
 import { RootState } from '../../../store/store'
 import globalStyles from '../../styles.module.css'
+import styles from './ActionButtons.module.css'
 
 interface ActionButtonsProps {
   slug: string
@@ -27,7 +27,7 @@ const ActionButtons = ({ slug, hidden }: ActionButtonsProps) => {
     // Save drawn value...
     const newDrawnValues = [...draw.draw.previousValues, draw.draw.values[draw.draw.drawnIndex]]
     // ...then remove it from values
-    const newValues = draw.draw.values.filter((v, i) => i !== draw.draw.drawnIndex)
+    const newValues = draw.draw.values.filter((v: string, i: number) => i !== draw.draw.drawnIndex)
     drawValueAndStartAnimation(newValues, newDrawnValues)
   }
 
